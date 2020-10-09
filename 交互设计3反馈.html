@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>交互设计3反馈</title>
+</head>
+<style>
+	html{
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+	}
+	body{
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		background-color: #333;
+
+		transition: transform 1s ease;
+
+	}
+	span{
+		-moz-user-select: none; /*火狐*/
+		-webkit-user-select: none; /*webkit浏览器*/
+		-ms-user-select: none; /*IE10*/
+		user-select: none;
+	}
+	.main-box{
+		position: relative;
+		top: 60px;
+		height: 800px;
+		width: 1200px;
+		margin: auto;
+		border-radius: 5px; 
+		overflow: hidden;
+		box-shadow: 2px 2px px 0 rgb(0,0,0);	
+	}
+	.video-box{
+		position: absolute;
+		top: 0;
+		height: 740px;
+		width: 100%;
+		background-color: #111;
+	}
+	.danmu-box{
+		position: absolute;
+		top: 0;
+		height: 740px;
+		width: 100%;
+		background-color: transparent;
+	}
+	.danmu{
+		position: absolute;
+		left: 0;
+		width: 20px;
+		color: #fff;
+		font-size: 22px;
+		/*background-color: orange;*/
+		transform: translateY(-100%);
+		transition: all 5s linear;
+	}
+	.danmu span{
+		word-break:break-all;
+	}
+	.danmu-insert-box{
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		height: 60px;
+		background-color: #555;
+		display: flex;
+	}
+	.danmu-insert{
+		height: 40px;
+		width: 150px;
+		border-radius: 20px;
+		margin: 10px 0 10px 60px;
+		background-color: #ddd;
+		overflow: hidden;
+		padding-left: 8px;
+		transition: all 0.3s ease;
+	}
+	.danmu-insert:hover{
+		background-color: #fff !important;
+		border-radius: 3px !important;
+	}
+	.danmu-insert input{
+		border: 0;
+		outline: none;
+		display: block;
+		width: 100%;
+		height: 100%;
+		background-color: transparent; 
+		font-size: 20px;
+	}
+	.send-button{
+		height: 40px;
+		width: 80px;
+		margin: 10px;
+		border-radius: 20px;
+		background-color: #bfe9eb;
+		text-align: center;
+		line-height: 40px;
+		letter-spacing: 2px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		overflow: hidden;
+	}
+	.send-button:hover{
+		border-radius: 3px !important;
+	}
+
+</style>
+<body id="body" onmouseup="mouseUp()">
+	<div class="main-box">
+		<div class="video-box">
+			<div class="video"></div>
+		</div>	
+		<div class="danmu-box" id="danmuBox">
+			
+		</div>
+		<div class="danmu-insert-box">
+			<div class="danmu-insert" id="danmuText" onmousedown="mouseDown()" onmouseup="mouseUp()">
+				<input type="text" id="input" placeholder="来畅快地聊天吧">
+				<!-- <input type="text" id="input"> -->
+			</div>
+			<div  id="sendBtn" class="send-button" onmousedown="getDanmu()">
+				<span>发送</span>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+
+	//获取装弹幕的盒子用于向里面添加弹幕
+	let danmuBox = document.getElementById('danmuBox')
+	//获取输入框，用于拿到输入的信息
+	let input = document.getElementById("input")
+	//获取整个页面用于翻转
+	let body = document.getElementById("body")
+	//输入框盒子用于控制输入框的大小
+	let inputBox = document.getElementById("danmuText")
+	//发送按钮
+	let sendBtn = document.getElementById("sendBtn")
+	//用来防止在输入框中按下鼠标，在其他地方松开鼠标不调用函数的变量
+	let isMosueDown = false
+	let isFocus = false
+
+
+	//回车键自动发送
+	input.onkeydown = function(e){
+		if(e.keyCode === 13){//如果按回车键调用获取内容的函数
+			getDanmu()
+		}
+	}
+	//输入框聚焦和失焦的样式改变
+	input.onfocus = function(){
+		isFocus = true
+	}
+	input.onblur = function(){
+		if(input.value === ""){
+			inputBox.style.width = "150px"
+			inputBox.style.borderRadius = "20px"
+			inputBox.style.backgroundColor = "#ddd"
+		}
+		isFocus = false
+	}
+
+	//输入框微动画
+	function mouseDown(){
+		if(!isFocus){
+			inputBox.style.width = "130px"
+			isMosueDown = true
+		}
+	}
+	function mouseUp(){
+		if(isMosueDown){
+			inputBox.style.width = "600px"
+			inputBox.style.borderRadius = "3px"
+			inputBox.style.backgroundColor = "#fff"
+
+			isMosueDown = false
+		}
+	}
+
+	//获取弹幕
+	function getDanmu(){
+		let text = input.value	//从输入框中获取输入的内容
+		if(text === ''){	//如果没有输入(为空字符)
+			sendBtn.style.backgroundColor = "#ec7a61"
+			sendBtn.style.width = "160px"
+			sendBtn.innerText = "你说你🐎呢"
+			setTimeout(()=>{
+				sendBtn.style.width = "80px"
+				sendBtn.style.backgroundColor = "#bfe9eb"
+				sendBtn.innerText = "发送"
+			},1600)
+		} else if(text === '666'){
+			body.style.transform = "rotateZ(180deg)"
+			sendDanmu(text)	
+			input.value = ''
+		} else {
+
+			sendDanmu(text)	//调用发送弹幕函数
+			input.value = ''//将输入框清空，以便下次发送
+
+			/** 点击时无法主动触发blur事件*/
+			input.blur() //主动失去焦点，恢复短矩形状态
+
+			sendBtn.style.backgroundColor = "#76fea6"
+			sendBtn.style.width = "160px"
+			sendBtn.innerText = "说的还真不错"
+			setTimeout(()=>{
+				sendBtn.style.width = "80px"
+				sendBtn.style.backgroundColor = "#bfe9eb"
+				sendBtn.innerText = "发送"
+			},1600)
+		}
+
+
+	}
+
+	//发送弹幕
+	function sendDanmu(text){
+
+		let i = Math.floor(Math.random()*60)//用来控制弹幕位置的随机函数
+
+		let danmu = document.createElement('div')//创建一个弹幕元素
+		danmu.setAttribute("class","danmu")//设置元素的样式
+		danmu.style.top = '0px'//元素从顶部生成
+		danmu.style.left =  i*20 +'px'//元素距离左边的距离(根据随机数调整)
+		danmu.innerHTML = "<span>" + text + "</span>"//将输入的信息添加到元素中去
+		danmuBox.appendChild(danmu)//将元素放到页面上
+	
+		moveDanmu(danmu)//让元素开始下落
+
+		removeDanmu()//删除元素
+	}
+
+	//让弹幕移动
+	function moveDanmu(el){
+		setTimeout(()=>{
+			el.style.top = "740px"
+			el.style.transform = "translateY(100%)"
+		},0)
+	}
+
+	//弹幕到底后移除弹幕
+	function removeDanmu(){
+		setTimeout(()=>{
+			danmuBox.removeChild(danmuBox.childNodes[1])	
+		},5000)
+	}
+</script>
+</body>
+</html>

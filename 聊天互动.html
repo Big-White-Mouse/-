@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天互动</title>
+</head>
+<style>
+* {
+        margin: 0;
+        padding: 0;
+    }
+
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    body {
+        background-color: #333;
+        transition: transform 1s ease;
+    }
+
+    span {
+        -moz-user-select: none;
+        /*火狐*/
+        -webkit-user-select: none;
+        /*webkit浏览器*/
+        -ms-user-select: none;
+        /*IE10*/
+        user-select: none;
+    }
+
+    input::-webkit-input-placeholder {
+        color: white;
+    }
+
+    input::-moz-placeholder {
+        /* Mozilla Firefox 19+ */
+        color: white;
+    }
+
+    input:-moz-placeholder {
+        /* Mozilla Firefox 4 to 18 */
+        color: white;
+    }
+
+    input:-ms-input-placeholder {
+        /* Internet Explorer 10-11 */
+        color: white;
+    }
+
+    .main-box {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .danmu-box {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background-color: transparent;
+    }
+
+    .danmu {
+        position: absolute;
+        left: 0;
+        width: 20px;
+        color: #fff;
+        font-size: 22px;
+        /*background-color: orange;*/
+        transform: translateY(-100%);
+        transition: all 5s linear;
+    }
+
+    .danmu span {
+        word-break: break-all;
+    }
+
+    .danmu-insert-box {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 120px;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        padding: 0 20px;
+    }
+
+    .danmu-insert {
+        height: 40px;
+        width: 150px;
+        border-radius: 20px;
+        background-color: #d2ebff;
+        overflow: hidden;
+        padding-left: 10px;
+        transition: all 0.3s ease;
+        color: #fff;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .danmu-insert:hover {
+        background-color: #89cbff !important;
+        border-radius: 3px !important;
+    }
+
+    .danmu-insert input {
+        border: 0;
+        outline: none;
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        font-size: 18px;
+        color: #fff;
+    }
+
+    .send-button {
+        box-sizing: border-box;
+        height: 40px;
+        width: 80px;
+        border-radius: 20px;
+        background-color: #e4fbfc;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .send-button:hover {
+        background-color: #79f0ff !important;
+        border-radius: 3px !important;
+    }
+
+
+
+    .header {
+        height: 100%;
+        position: relative;
+        text-align: center;
+        background: linear-gradient(60deg, rgba(84, 58, 183, 1) 0%, rgba(0, 172, 193, 1) 100%);
+        color: white;
+    }
+
+    .waves {
+        position: absolute;
+        bottom: 120px;
+        left: 0;
+        width: 100%;
+        height: 15vh;
+        margin-bottom: -7px;
+        /*Fix for safari gap*/
+        min-height: 100px;
+        max-height: 150px;
+    }
+
+    .content {
+        position: relative;
+        height: 20vh;
+        text-align: center;
+        background-color: white;
+    }
+
+    .parallax>use {
+        animation: move-forever 25s cubic-bezier(.55, .5, .45, .5) infinite;
+    }
+
+    .parallax>use:nth-child(1) {
+        animation-delay: -2s;
+        animation-duration: 7s;
+    }
+
+    .parallax>use:nth-child(2) {
+        animation-delay: -3s;
+        animation-duration: 10s;
+    }
+
+    .parallax>use:nth-child(3) {
+        animation-delay: -4s;
+        animation-duration: 13s;
+    }
+
+    .parallax>use:nth-child(4) {
+        animation-delay: -5s;
+        animation-duration: 20s;
+    }
+
+    @keyframes move-forever {
+        0% {
+            transform: translate3d(-90px, 0, 0);
+        }
+
+        100% {
+            transform: translate3d(85px, 0, 0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .waves {
+            height: 40px;
+            min-height: 40px;
+        }
+
+        .content {
+            height: 30vh;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+    }
+
+
+</style>
+<body id="body" onmouseup="mouseUp()">
+<div class="main-box">
+    <div class="header">
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path>
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7"></use>
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)"></use>
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)"></use>
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff"></use>
+            </g>
+        </svg>
+    </div>
+    <div class="danmu-box" id="danmuBox">
+
+    </div>
+    <div class="danmu-insert-box">
+        <div class="danmu-insert" id="danmuText" onmousedown="mouseDown()" onmouseup="mouseUp()">
+            <input type="text" id="input" placeholder="来畅快地聊天吧">
+        </div>
+        <div  id="sendBtn" class="send-button" onmouseup="getDanmu()">
+            <span>发送</span>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    window.onload = function (){
+    	initWebSocket()
+
+    	//WebSocket方法
+    	//连接发生错误的回调方法
+    	websocket.onerror = function(){
+    		console.log('连接错误');
+    	};
+    	//连接成功建立的回调方法
+    	websocket.onopen = function(event){
+    		console.log("连接成功",event);
+    	}
+    	//接收到消息的回调方法
+    	websocket.onmessage = function(event){
+            console.log("0.接收到消息");
+            sendDanmu(event.data)
+    	}
+    	//连接关闭的回调方法
+    	websocket.onclose = function() {
+    		console.log("关闭连接");
+    	}
+    }
+
+    //获取装弹幕的盒子用于向里面添加弹幕
+    let danmuBox = document.getElementById('danmuBox')
+    //获取输入框，用于拿到输入的信息
+    let input = document.getElementById("input")
+    //获取整个页面用于翻转
+    let body = document.getElementById("body")
+    //输入框盒子用于控制输入框的大小
+    let inputBox = document.getElementById("danmuText")
+    //发送按钮
+    let sendBtn = document.getElementById("sendBtn")
+    //用来防止在输入框中按下鼠标，在其他地方松开鼠标不调用函数的变量
+    let isMosueDown = false
+    let isFocus = false
+    let websocket = null
+    //初始化websocket
+    function initWebSocket(){
+    	let id = get_uuid()
+    	if('WebSocket' in window){
+    		websocket = new WebSocket("ws://39.107.101.13:8086/ws/" + id)
+    	} else {
+    		alert('浏览器不支持通信')
+    	}
+    }
+    //给每个用户生成一个随机不重复id
+    function get_uuid(){
+    	let s = [];
+    	let hexDigits = "0123456789abcdef";
+    	for (let i = 0; i < 36; i++) {
+    		s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    	}
+    	s[14] = "4";
+    	s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);
+    	s[8] = s[13] = s[18] = s[23] = "-";
+
+    	let uuid = s.join("");
+    	return uuid;
+    }
+    //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+    window.onbeforeunload = function(){
+    	websocket.close();
+    }
+
+
+    //回车键自动发送
+    document.onkeydown = function(e){
+        if(e.keyCode === 13){//如果按回车键调用获取内容的函数
+            if(isFocus){
+
+            } else {
+                mouseDown()
+            }
+        }
+    }
+    document.onkeyup = function(e){
+        if(e.keyCode === 13){
+            if(isFocus){
+                getDanmu()
+                // input.blur()
+            } else {
+                mouseUp()
+                input.focus()
+            }
+        }
+    }
+    //输入框聚焦和失焦的样式改变
+    input.onfocus = function(){
+        isFocus = true
+    }
+    input.onblur = function(){
+        if(input.value === ""){
+            inputBox.style.width = "150px"
+            inputBox.style.borderRadius = "20px"
+            inputBox.style.backgroundColor = "#d2ebff"
+        }
+        isFocus = false
+    }
+
+    //输入框微动画
+    function mouseDown(){
+        if(!isFocus && input.value === ""){
+            inputBox.style.width = "130px"
+            isMosueDown = true
+        }
+    }
+    function mouseUp(){
+        if(isMosueDown){
+            inputBox.style.width = "600px"
+            inputBox.style.borderRadius = "3px"
+            inputBox.style.backgroundColor = "#89cbff"
+
+            isMosueDown = false
+        }
+    }
+    //获取弹幕
+    function getDanmu(){
+
+        let text = input.value	//从输入框中获取输入的内容
+        if(text === ''){	//如果没有输入(为空字符)
+            sendBtn.style.backgroundColor = "#ec7a61"
+            sendBtn.style.width = "160px"
+            sendBtn.innerHTML = "你说你&#128014;呢"
+            setTimeout(()=>{
+                sendBtn.style.width = "80px"
+                sendBtn.style.backgroundColor = "#bfe9eb"
+                sendBtn.innerText = "发送"
+            },1000)
+        } else if(text === '666'){
+            body.style.transform = "rotateZ(180deg)"
+            sendDanmu(text)
+            input.value = ''
+        } else {
+            websocket.send(text)
+            // sendDanmu(text)	//调用发送弹幕函数
+            input.value = ''//将输入框清空，以便下次发送
+
+            /** 点击时无法主动触发blur事件*/
+            input.blur() //主动失去焦点，恢复短矩形状态
+
+            sendBtn.style.backgroundColor = "#76fea6"
+            sendBtn.style.width = "160px"
+            sendBtn.innerText = "说的还真不错"
+            setTimeout(()=>{
+                sendBtn.style.width = "80px"
+                sendBtn.style.backgroundColor = "#bfe9eb"
+                sendBtn.innerText = "发送"
+            },1000)
+        }
+    }
+    //发送弹幕
+    function sendDanmu(text){
+        console.log("1.收到弹幕文字", text);
+        let i = Math.floor(Math.random()*parseInt(document.body.clientWidth/20))//用来控制弹幕位置的随机函数
+        let danmu = document.createElement('div')//创建一个弹幕元素
+        danmu.setAttribute("class","danmu")//设置元素的样式
+        danmu.style.top = '0px'//元素从顶部生成
+        danmu.style.left =  i*20 +'px'//元素距离左边的距离(根据随机数调整)
+        danmu.innerHTML = "<span>" + text + "</span>"//将输入的信息添加到元素中去
+        danmuBox.appendChild(danmu)//将元素放到页面上
+        console.log("2.弹幕元素生成结束");
+
+        moveDanmu(danmu)//让元素开始下落
+
+        removeDanmu()//删除元素
+    }
+    //让弹幕移动
+    function moveDanmu(el){
+        console.log("3.弹幕准备开始移动");
+        setTimeout(()=>{
+            console.log("4.弹幕开始移动");
+            el.style.top = "740px"
+            el.style.transform = "translateY(100%)"
+        },100)
+        console.log("5.弹幕移动准备完成");
+    }
+    //弹幕到底后移除弹幕
+    function removeDanmu(){
+        console.log("6.弹幕删除开始准备");
+        setTimeout(()=>{
+            danmuBox.removeChild(danmuBox.childNodes[1])
+            console.log("7.弹幕删除完成");
+        },5000)
+    }
+</script>
+</body>
+</html>
